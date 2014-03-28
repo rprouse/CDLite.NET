@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "NativePlayer.h"
 
+#include <string>
+
 NativePlayer::NativePlayer() 
     : m_wDeviceID( 0 ), m_callback( 0 ), m_currentDevice( 0 ), m_strCdRomDrives( nullptr )
 {
