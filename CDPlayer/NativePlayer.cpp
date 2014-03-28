@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "NativePlayer.h"
 
-
 NativePlayer::NativePlayer() 
-    : m_wDeviceID( 0 ), m_hWnd( nullptr ), m_currentDevice( 0 ), m_strCdRomDrives( nullptr )
+    : m_wDeviceID( 0 ), m_callback( 0 ), m_currentDevice( 0 ), m_strCdRomDrives( nullptr )
 {
+    m_szLastError[0] = '\0';
+
     // List all valid CD-ROM Devices
     unsigned int nCount = 0;
     wchar_t  strTemp[4];
@@ -28,7 +29,7 @@ NativePlayer::NativePlayer()
     }
     m_numDevices = nCount;
     m_strCdRomDrives = new wchar_t[nCount];
-    wcsncpy( m_strCdRomDrives, strTemp2, nCount );
+    wcsncpy_s( m_strCdRomDrives, nCount, strTemp2, nCount );
 
     SetDriveID( 0 );
 }
@@ -44,12 +45,11 @@ NativePlayer::~NativePlayer()
 
 void NativePlayer::Attach( HWND hWnd )
 {
-    m_hWnd = hWnd;
+    m_callback = MAKELONG( hWnd, 0 );
 }
 
-DWORD NativePlayer::Open()
+bool NativePlayer::Open()
 {
-    DWORD dwReturn;
     TCHAR szElementName[4];
     TCHAR szAliasName[32];
     DWORD dwAliasCount = GetCurrentTime();
@@ -73,9 +73,9 @@ DWORD NativePlayer::Open()
     DWORD dwFlags = MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE | MCI_OPEN_ALIAS |
         MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID | MCI_WAIT;
 
-    if ( dwReturn = mciSendCommand( NULL, MCI_OPEN, dwFlags, (DWORD)(LPVOID)&mciOpenParms ) )
+    if ( !SendCommand( NULL, MCI_OPEN, dwFlags, (DWORD)(LPVOID)&mciOpenParms ) )
     {
-        return dwReturn;
+        return false;
     }
 
     // If we already have a device open, we should close it
@@ -87,44 +87,45 @@ DWORD NativePlayer::Open()
     // Set the time format to track/minute/second/frame (TMSF).
     MCI_SET_PARMS mciSetParms;
     mciSetParms.dwTimeFormat = MCI_FORMAT_TMSF;
-    if ( dwReturn = mciSendCommand( m_wDeviceID, MCI_SET, MCI_SET_TIME_FORMAT, (DWORD)(LPVOID)&mciSetParms ) )
+    if ( !SendCommand( m_wDeviceID, MCI_SET, MCI_SET_TIME_FORMAT, (DWORD)(LPVOID)&mciSetParms ) )
     {
         Close();
-        return ( dwReturn );
+        return false;
     }
-    return ( 0L );
+    return true;
 }
 
-void NativePlayer::Close()
+bool NativePlayer::Close()
 {
+    bool result = true;
     if ( m_wDeviceID )
     {
-        mciSendCommand( m_wDeviceID, MCI_CLOSE, 0, NULL );
+        result = SendCommand( m_wDeviceID, MCI_CLOSE, 0, NULL );
         m_wDeviceID = 0;
     }
+    return result;
 }
 
-void NativePlayer::Stop()
+bool NativePlayer::Stop()
 {
-    if ( !m_wDeviceID ) return;
+    if ( !m_wDeviceID ) 
+        return true;
 
     MCI_GENERIC_PARMS mciParms;
-    mciParms.dwCallback = (DWORD)m_hWnd;
-    mciSendCommand( m_wDeviceID, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciParms );
+    mciParms.dwCallback = m_callback;
+    SendCommand( m_wDeviceID, MCI_STOP, MCI_NOTIFY, (DWORD)(LPVOID)&mciParms );
 
-    SeekTrack( GetTrack() );
+    return SeekTrack( GetTrack() );
 }
 
 // Plays a specified audio track using MCI_OPEN, MCI_PLAY. Returns as 
 // soon as playback begins. The window procedure function for the 
 // specified window will be notified when playback is complete. 
 // Returns 0L on success; otherwise, returns an MCI error code.
-DWORD NativePlayer::PlayTrack( BYTE bTrack )
+bool NativePlayer::PlayTrack( BYTE bTrack )
 {
-    DWORD dwReturn;
-
-    if ( !m_wDeviceID && ( dwReturn = Open() ) != 0 )
-        return dwReturn;
+    if ( !m_wDeviceID && !Open() )
+        return false;
 
     // Begin play from the specified track and play to the beginning 
     // of the next track. The window procedure function for the parent 
@@ -136,20 +137,18 @@ DWORD NativePlayer::PlayTrack( BYTE bTrack )
     mciPlayParms.dwTo = 0L;
     mciPlayParms.dwFrom = MCI_MAKE_TMSF( bTrack, 0, 0, 0 );
     //mciPlayParms.dwTo = MCI_MAKE_TMSF(bTrack + 1, 0, 0, 0);
-    mciPlayParms.dwCallback = (DWORD)m_hWnd;
-    if ( dwReturn = mciSendCommand( m_wDeviceID, MCI_PLAY, MCI_FROM | MCI_NOTIFY,
-        (DWORD)(LPVOID)&mciPlayParms ) )
+    mciPlayParms.dwCallback = m_callback;
+    if ( !SendCommand( m_wDeviceID, MCI_PLAY, MCI_FROM | MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms ) )
     {
         Close();
-        return ( dwReturn );
+        return false;
     }
-    return ( 0L );
+    return true;
 }
 
-DWORD NativePlayer::NextTrack()
+bool NativePlayer::NextTrack()
 {
-    BYTE track = GetTrack();
-    track++;
+    BYTE track = GetTrack() + 1;
     BYTE total = GetNumberOfTracks();
     if ( track > total )
         track = 1;
@@ -159,10 +158,9 @@ DWORD NativePlayer::NextTrack()
         return SeekTrack( track );
 }
 
-DWORD NativePlayer::PrevTrack()
+bool NativePlayer::PrevTrack()
 {
-    BYTE track = GetTrack();
-    track--;
+    BYTE track = GetTrack() - 1;
     if ( track < 1 ) track = GetNumberOfTracks();
     if ( GetMode() == MCI_MODE_PLAY )
         return PlayTrack( track );
@@ -170,60 +168,55 @@ DWORD NativePlayer::PrevTrack()
         return SeekTrack( track );
 }
 
-DWORD NativePlayer::Play()
+bool NativePlayer::Play()
 {
     if ( GetMode() == MCI_MODE_PLAY )
-        return ( 0L );
+        return true;
 
-    DWORD dwReturn;
-    if ( !m_wDeviceID && ( dwReturn = Open() ) != 0 )
-        return dwReturn;
+    if ( !m_wDeviceID && !Open() )
+        return false;
 
     MCI_PLAY_PARMS mciPlayParms;
     mciPlayParms.dwFrom = 0L;
     mciPlayParms.dwTo = 0L;
-    mciPlayParms.dwCallback = (DWORD)m_hWnd;
-    if ( dwReturn = mciSendCommand( m_wDeviceID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms ) )
+    mciPlayParms.dwCallback = m_callback;
+    if ( !SendCommand( m_wDeviceID, MCI_PLAY, MCI_NOTIFY, (DWORD)(LPVOID)&mciPlayParms ) )
     {
         Close();
-        return ( dwReturn );
+        return false;
     }
-    return ( 0L );
+    return true;
 }
 
-DWORD NativePlayer::Pause()
+bool NativePlayer::Pause()
 {
-    DWORD dwReturn;
-
-    if ( !m_wDeviceID && ( dwReturn = Open() ) != 0 )
-        return dwReturn;
+    if ( !m_wDeviceID && !Open() )
+        return false;
 
     switch ( GetMode() )
     {
     case MCI_MODE_PAUSE:
-        Play();
+        return Play();
         break;
     case MCI_MODE_PLAY:
     {
         MCI_GENERIC_PARMS mciParms;
-        dwReturn = mciSendCommand( m_wDeviceID, MCI_PAUSE, NULL, (DWORD)(LPVOID)&mciParms );
+        return SendCommand( m_wDeviceID, MCI_PAUSE, NULL, (DWORD)(LPVOID)&mciParms );
         break;
     }
     default:
         break;
     }
-    return ( dwReturn );
+    return true;
 }
 
-void NativePlayer::Eject()
+bool NativePlayer::Eject()
 {
-    DWORD dwReturn;
-
-    if ( !m_wDeviceID && ( dwReturn = Open() ) != 0 )
-        return;
+    if ( !m_wDeviceID && !Open() )
+        return false;
 
     MCI_SET_PARMS mciset;
-    mciSendCommand( m_wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, (DWORD)(LPCWSTR)&mciset );
+    return SendCommand( m_wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, (DWORD)(LPCWSTR)&mciset );
 }
 
 DWORD NativePlayer::GetStatus( DWORD dwItem, DWORD dwTrack )
@@ -238,7 +231,7 @@ DWORD NativePlayer::GetStatus( DWORD dwItem, DWORD dwTrack )
     mciParms.dwItem = dwItem;
     mciParms.dwTrack = dwTrack;
     mciParms.dwReturn = 0L;
-    mciSendCommand( m_wDeviceID, MCI_STATUS, flags, (DWORD)(LPVOID)&mciParms );
+    SendCommand( m_wDeviceID, MCI_STATUS, flags, (DWORD)(LPVOID)&mciParms );
     return mciParms.dwReturn;
 }
 
@@ -262,27 +255,24 @@ DWORD NativePlayer::GetPosition()
     return GetStatus( MCI_STATUS_POSITION );
 }
 
-void NativePlayer::ShowError( DWORD dwError )
+wchar_t* NativePlayer::GetLastError()
 {
-    TCHAR szErrorBuf[MAXERRORLENGTH];
-    if ( mciGetErrorString( dwError, (LPWSTR)szErrorBuf, MAXERRORLENGTH ) )
-    {
-        //MessageBox( m_hWnd, szErrorBuf, TEXT( "CD Player Error" ), MB_ICONEXCLAMATION );
-    }
-    else
-    {
-        //MessageBox( m_hWnd, TEXT( "Unknown Error" ), TEXT( "CD Player Error" ), MB_ICONEXCLAMATION );
-    }
+    return m_szLastError;
 }
 
-DWORD NativePlayer::SeekTrack( BYTE bTrack )
+void NativePlayer::SetLastError( DWORD dwError )
+{
+    mciGetErrorString( dwError, m_szLastError, MAXERRORLENGTH );
+}
+
+bool NativePlayer::SeekTrack( BYTE bTrack )
 {
     if ( !m_wDeviceID )
-        return 0L;
+        return true;
 
     MCI_SEEK_PARMS mciParms;
     mciParms.dwTo = MCI_MAKE_TMSF( bTrack, 0, 0, 0 );
-    return mciSendCommand( m_wDeviceID, MCI_SEEK, MCI_TO, (DWORD)(LPVOID)&mciParms );
+    return SendCommand( m_wDeviceID, MCI_SEEK, MCI_TO, (DWORD)(LPVOID)&mciParms );
 }
 
 wchar_t* NativePlayer::GetDrives()
@@ -309,4 +299,15 @@ DWORD NativePlayer::SetDriveID( unsigned int id )
 unsigned int NativePlayer::GetDriveID()
 {
     return m_currentDevice;
+}
+
+bool NativePlayer::SendCommand( _In_ MCIDEVICEID mciId, _In_ UINT uMsg, _In_opt_ DWORD_PTR dwParam1, _In_opt_ DWORD_PTR dwParam2 )
+{
+    DWORD result = mciSendCommand( mciId, uMsg, dwParam1, dwParam2 );
+    if ( result != 0 )
+    {
+        SetLastError( result );
+        return false;
+    }
+    return true;
 }

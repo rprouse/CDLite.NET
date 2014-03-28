@@ -9,16 +9,21 @@ public:
     NativePlayer();
     virtual ~NativePlayer();
 
-    DWORD PlayTrack( BYTE bTrack );
-    DWORD Open();
-    void  Close();
-    void  Stop();
-    void  Attach( HWND hWnd );
-    DWORD NextTrack();
-    DWORD PrevTrack();
-    DWORD Play();
-    DWORD Pause();
-    void  Eject();
+    /**
+    * Attaches a window that will then receive MCI_NOTIFY messages
+    * as a result of the various MCI commands
+    **/
+    void Attach( HWND hWnd );
+
+    bool PlayTrack( BYTE bTrack );
+    bool Open();
+    bool Close();
+    bool Stop();
+    bool NextTrack();
+    bool PrevTrack();
+    bool Play();
+    bool Pause();
+    bool Eject();
 
     /**
     * @return MCI_MODE_NOT_READY
@@ -34,34 +39,37 @@ public:
     BYTE  GetNumberOfTracks();
     DWORD GetPosition();
 
-    // Pass in the error code returned from another function to display
-    // a message box with the error.
-    void  ShowError( DWORD dwError );
-
     /// @return A string containing the drive letters for valid CDROM drives
     wchar_t* GetDrives();
 
     /// @return The number of CD drives on a system
-    unsigned int    GetNumDrives();
+    unsigned int GetNumDrives();
 
     /**
     * Sets the CD drive that we will be using
     * @param id The index into the string returned by GetDrives() that we want to open
     * @return 0 on success, 1 on failure
     **/
-    DWORD   SetDriveID( unsigned int id );
+    DWORD SetDriveID( unsigned int id );
 
     /**
     * @return The index into the string returned by GetDrives() that we are currently using
     **/
-    unsigned int    GetDriveID();
+    unsigned int GetDriveID();
+
+    /**
+    * Gets the last error
+    * @return The last error that happened
+    **/
+    wchar_t* GetLastError();
 
 protected:
-    unsigned int    m_wDeviceID;
-    HWND    m_hWnd;
-    unsigned int    m_currentDevice;    // Which CD device in m_strCdRomDrives is currently being used
-    unsigned int    m_numDevices;    // The number of valid CD drives
-    wchar_t*  m_strCdRomDrives;    // A string containing valid CD drives, like "DE"
+    DWORD        m_callback;
+    unsigned int m_wDeviceID;
+    unsigned int m_currentDevice;  // Which CD device in m_strCdRomDrives is currently being used
+    unsigned int m_numDevices;     // The number of valid CD drives
+    wchar_t*     m_strCdRomDrives; // A string containing valid CD drives, like "DE"
+    wchar_t      m_szLastError[MAXERRORLENGTH];
 
     /**
     MCI_STATUS_CURRENT_TRACK
@@ -74,6 +82,18 @@ protected:
     MCI_STATUS_MEDIA_PRESENT
     **/
     DWORD GetStatus( DWORD dwItem, DWORD dwTrack = 0L );
-    DWORD SeekTrack( BYTE dwTrack );
+    bool  SeekTrack( BYTE dwTrack );
+
+    // Pass in the error code returned from another function to 
+    // set the error
+    void  SetLastError( DWORD dwError );
+
+    // A wrapper for mciSendCommand that checks the result and sets last error
+    bool SendCommand(
+        _In_ MCIDEVICEID mciId,
+        _In_ UINT uMsg,
+        _In_opt_ DWORD_PTR dwParam1,
+        _In_opt_ DWORD_PTR dwParam2
+        );
 };
 
