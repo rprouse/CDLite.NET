@@ -23,15 +23,21 @@
 // **********************************************************************************
 
 using System;
+using System.ComponentModel;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Alteridem.CD;
+using Alteridem.CDLite.Annotations;
 
 namespace Alteridem.CDLite
 {
-    public class CdViewModel : IDisposable
+    public class CdViewModel : IDisposable, INotifyPropertyChanged
     {
         private readonly IClosable _closable;
         private CDPlayer _player = new CDPlayer();
+        private string _time = "00:00";
+        private string _track = "00";
+        private readonly DispatcherTimer _timer;
 
         public CdViewModel(IClosable closable)
         {
@@ -43,6 +49,21 @@ namespace Alteridem.CDLite
             Stop = new RelayCommand(_ => OnStop(), _ => CanStop());
             Eject = new RelayCommand(_ => OnEject(), _ => CanEject());
             Close = new RelayCommand(_ => OnClose(), _ => CanClose());
+            
+            _timer = new DispatcherTimer();
+            _timer.Tick += OnTimer;
+            _timer.Interval = TimeSpan.FromMilliseconds(500);
+            _timer.Start();
+        }
+
+        private void OnTimer( object sender, EventArgs e )
+        {
+            int track = _player.Track;
+            _track = track.ToString( "00" );
+            OnPropertyChanged( "Track" );
+            TimeSpan time = _player.Time;
+            _time = time.ToString( @"mm\:ss" );
+            OnPropertyChanged( "Time" );
         }
 
         #region Implementation of IDisposable
@@ -61,6 +82,22 @@ namespace Alteridem.CDLite
 
         #endregion
 
+        #region Bindable Properties
+
+        public string Time
+        {
+            get { return _time; }
+        }
+
+        public string Track
+        {
+            get { return _track; }
+        }
+
+        #endregion
+
+        #region Commands
+
         public ICommand PreviousTrack { get; private set; }
         public ICommand NextTrack { get; private set; }
         public ICommand Play { get; private set; }
@@ -71,37 +108,37 @@ namespace Alteridem.CDLite
 
         private void OnPreviousTrack()
         {
-            _player.PreviousTrack();
+            _player.PreviousTrack( );
         }
 
         private void OnNextTrack()
         {
-            _player.NextTrack();
+            _player.NextTrack( );
         }
 
         private void OnPlay()
         {
-            _player.Play();
+            _player.Play( );
         }
 
         private void OnPause()
         {
-            _player.Pause();
+            _player.Pause( );
         }
 
         private void OnStop()
         {
-            _player.Stop();
+            _player.Stop( );
         }
 
         private void OnEject()
         {
-            _player.Eject();
+            _player.Eject( );
         }
 
         private void OnClose()
         {
-            _closable.Close();
+            _closable.Close( );
         }
 
         private bool CanPreviousTrack()
@@ -138,5 +175,20 @@ namespace Alteridem.CDLite
         {
             return true;
         }
+
+        #endregion
+
+        #region INotifyPropertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged( string propertyName )
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if ( handler != null ) handler( this, new PropertyChangedEventArgs( propertyName ) );
+        }
+
+        #endregion
     }
 }

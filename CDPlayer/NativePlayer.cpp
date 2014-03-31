@@ -65,7 +65,7 @@ bool NativePlayer::Open()
     if ( m_numDevices == 0 )
     {
         //AfxMessageBox( TEXT( "No CD Audio devices found on your system" ), MB_OK | MB_ICONSTOP );
-        return 1L;
+        return false;
     }
     wsprintf( szElementName, TEXT( "%c:" ), m_strCdRomDrives[m_currentDevice] );
     wsprintf( szAliasName, TEXT( "CD%lu:" ), dwAliasCount );
@@ -127,7 +127,7 @@ bool NativePlayer::Stop()
 // Returns 0L on success; otherwise, returns an MCI error code.
 bool NativePlayer::PlayTrack( BYTE bTrack )
 {
-    if ( !m_wDeviceID && !Open() )
+    if ( !m_wDeviceID /* && !Open() */ )
         return false;
 
     // Begin play from the specified track and play to the beginning 
@@ -176,7 +176,7 @@ bool NativePlayer::Play()
     if ( GetMode() == MCI_MODE_PLAY )
         return true;
 
-    if ( !m_wDeviceID && !Open() )
+    if ( !m_wDeviceID /*&& !Open()*/ )
         return false;
 
     MCI_PLAY_PARMS mciPlayParms;
@@ -193,7 +193,7 @@ bool NativePlayer::Play()
 
 bool NativePlayer::Pause()
 {
-    if ( !m_wDeviceID && !Open() )
+    if ( !m_wDeviceID /*&& !Open()*/ )
         return false;
 
     switch ( GetMode() )
@@ -215,7 +215,7 @@ bool NativePlayer::Pause()
 
 bool NativePlayer::Eject()
 {
-    if ( !m_wDeviceID && !Open() )
+    if ( !m_wDeviceID /*&& !Open()*/ )
         return false;
 
     MCI_SET_PARMS mciset;

@@ -36,7 +36,7 @@ namespace Alteridem { namespace CD
         property Alteridem::CD::Mode Mode{ Alteridem::CD::Mode get(); };
         property int Track{ int get(); };
         property int NumberOfTracks{ int get(); };
-        property System::TimeSpan^ Time{ System::TimeSpan^ get(); };
+        property System::TimeSpan Time{ System::TimeSpan get(); };
 
         /// @return A string containing the drive letters for valid CDROM drives
         //wchar_t* GetDrives();

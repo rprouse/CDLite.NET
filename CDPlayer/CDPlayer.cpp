@@ -114,12 +114,12 @@ namespace Alteridem { namespace CD
         return _nativePlayer->GetNumberOfTracks();
     }
 
-    System::TimeSpan^ CDPlayer::Time::get()
+    System::TimeSpan CDPlayer::Time::get()
     {
         DWORD_PTR dwTMSF = _nativePlayer->GetPosition();
         int min = MCI_TMSF_MINUTE( dwTMSF );
         int sec = MCI_TMSF_SECOND( dwTMSF );
-        return gcnew System::TimeSpan( 0, min, sec );
+        return System::TimeSpan( 0, min, sec );
     }
 
     /// @return A string containing the drive letters for valid CDROM drives
