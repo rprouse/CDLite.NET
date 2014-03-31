@@ -1,11 +1,12 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace Alteridem.CDLite
 {
     /// <summary>
     /// Interaction logic for CdView.xaml
     /// </summary>
-    public partial class CdView : Window, IClosable
+    public partial class CdView : Window, IWindow
     {
         private readonly CdViewModel _viewModel;
 
@@ -19,6 +20,12 @@ namespace Alteridem.CDLite
         private void OnClosed(object sender, System.EventArgs e)
         {
             _viewModel.Dispose();
+        }
+
+        private void OnMouseDown( object sender, MouseButtonEventArgs e )
+        {
+            if ( e.ChangedButton == MouseButton.Left )
+                DragMove();
         }
     }
 }
