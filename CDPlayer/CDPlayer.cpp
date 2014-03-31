@@ -2,7 +2,7 @@
 #include "CDPlayer.h"
 #include "NativePlayer.h"
 
-namespace Alteridem { namespace CDPlayer
+namespace Alteridem { namespace CD
 {
     CDPlayer::CDPlayer()
     {
@@ -80,41 +80,41 @@ namespace Alteridem { namespace CDPlayer
         return _nativePlayer->Eject();
     }
 
-    Mode CDPlayer::GetMode()
+    Mode CDPlayer::Mode::get()
     {
         DWORD mode = _nativePlayer->GetMode();
         switch ( mode )
         {
         case MCI_MODE_NOT_READY:
-            return Mode::NotReady;
+            return Alteridem::CD::Mode::NotReady;
         case MCI_MODE_PAUSE:
-            return Mode::Pause;
+            return Alteridem::CD::Mode::Pause;
         case MCI_MODE_PLAY:
-            return Mode::Play;
+            return Alteridem::CD::Mode::Play;
         case MCI_MODE_STOP:
-            return Mode::Stop;
+            return Alteridem::CD::Mode::Stop;
         case MCI_MODE_OPEN:
-            return Mode::Open;
+            return Alteridem::CD::Mode::Open;
         case MCI_MODE_RECORD:
-            return Mode::Record;
+            return Alteridem::CD::Mode::Record;
         case MCI_MODE_SEEK:
-            return Mode::Seek;
+            return Alteridem::CD::Mode::Seek;
         default:
-            return Mode::Unknown;            
+            return Alteridem::CD::Mode::Unknown;
         }
     }
 
-    int  CDPlayer::GetTrack()
+    int  CDPlayer::Track::get()
     {
         return _nativePlayer->GetTrack();
     }
 
-    int  CDPlayer::GetNumberOfTracks()
+    int  CDPlayer::NumberOfTracks::get()
     {
         return _nativePlayer->GetNumberOfTracks();
     }
 
-    System::TimeSpan^ CDPlayer::GetTime()
+    System::TimeSpan^ CDPlayer::Time::get()
     {
         DWORD dwTMSF = _nativePlayer->GetPosition();
         int min = MCI_TMSF_MINUTE( dwTMSF );
@@ -126,7 +126,7 @@ namespace Alteridem { namespace CDPlayer
     //wchar_t* CDPlayer::GetDrives();
 
     /// @return The number of CD drives on a system
-    unsigned int CDPlayer::GetNumDrives()
+    unsigned int CDPlayer::NumberOfDrives::get()
     {
         return _nativePlayer->GetNumDrives();
     }
@@ -136,15 +136,15 @@ namespace Alteridem { namespace CDPlayer
     * @param id The index into the string returned by GetDrives() that we want to open
     * @return 0 on success, 1 on failure
     **/
-    bool CDPlayer::SetDrive( unsigned int id )
+    void CDPlayer::Drive::set( unsigned int id )
     {
-        return _nativePlayer->SetDriveID( id );
+        _nativePlayer->SetDriveID( id );
     }
 
     /**
     * @return The index into the string returned by GetDrives() that we are currently using
     **/
-    unsigned int CDPlayer::GetDrive()
+    unsigned int CDPlayer::Drive::get()
     {
         return _nativePlayer->GetDriveID();
     }
@@ -153,7 +153,7 @@ namespace Alteridem { namespace CDPlayer
     * Gets the last error
     * @return The last error that happened
     **/
-    System::String^ CDPlayer::GetLastError()
+    System::String^ CDPlayer::LastError::get()
     {
         return gcnew System::String( _nativePlayer->GetLastError() );
     }

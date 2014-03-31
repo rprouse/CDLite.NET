@@ -2,7 +2,7 @@
 
 class NativePlayer;
 
-namespace Alteridem { namespace CDPlayer
+namespace Alteridem { namespace CD
 {
     public enum Mode
     {
@@ -33,34 +33,33 @@ namespace Alteridem { namespace CDPlayer
         bool Pause();
         bool Eject();
         
-        Mode GetMode();
-        int  GetTrack();
-        int  GetNumberOfTracks();
-        System::TimeSpan^ GetTime();
+        property Alteridem::CD::Mode Mode{ Alteridem::CD::Mode get(); };
+        property int Track{ int get(); };
+        property int NumberOfTracks{ int get(); };
+        property System::TimeSpan^ Time{ System::TimeSpan^ get(); };
 
         /// @return A string containing the drive letters for valid CDROM drives
         //wchar_t* GetDrives();
 
         /// @return The number of CD drives on a system
-        unsigned int GetNumDrives();
+        property unsigned int NumberOfDrives{ unsigned int get(); };
 
         /**
         * Sets the CD drive that we will be using
         * @param id The index into the string returned by GetDrives() that we want to open
         * @return 0 on success, 1 on failure
         **/
-        bool SetDrive( unsigned int id );
-
-        /**
-        * @return The index into the string returned by GetDrives() that we are currently using
-        **/
-        unsigned int GetDrive();
+        property unsigned int Drive
+        {
+            unsigned int get();
+            void set( unsigned int );
+        }
 
         /**
         * Gets the last error
         * @return The last error that happened
         **/
-        System::String^ GetLastError();
+        property System::String^ LastError{ System::String^ get(); };
 
     private:
         NativePlayer* _nativePlayer;
