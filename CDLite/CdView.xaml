@@ -5,30 +5,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:cdLite="clr-namespace:Alteridem.CDLite"
         Title="CDLite" 
-        Height="30" 
-        Width="525" 
+        Height="20" 
+        Width="250" 
         WindowStartupLocation="Manual" 
         WindowStyle="None" 
         ResizeMode="NoResize" 
         SizeToContent="WidthAndHeight"
+        Background="Transparent"
+        AllowsTransparency="True"
         Closed="OnClosed"
         mc:Ignorable="d" 
         d:DataContext="{d:DesignInstance cdLite:CdViewModel}">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
-            <Setter Property="Width" Value="30" />
-            <Setter Property="Height" Value="30" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
             <Setter Property="Margin" Value="0" />
-            <Setter Property="Padding" Value="3" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="#333" />
+            <Setter Property="FontSize" Value="10px" />
+            <Setter Property="TextElement.FontFamily" Value="pack://application:,,,/fonts/#FontAwesome" />
         </Style>
     </Window.Resources>
-    <StackPanel Orientation="Horizontal">
-        <Button Content="|&lt;" Command="{Binding Path=PreviousTrack}" />
-        <Button Content="&gt;" Command="{Binding Path=Play}" />
-        <Button Content="||" Command="{Binding Path=Pause}" />
-        <Button Content="[]" Command="{Binding Path=Stop}" />
-        <Button Content="&gt;|" Command="{Binding Path=NextTrack}" />
-        <Button Content="^" Command="{Binding Path=Eject}" />
-        <Button Content="X" Command="{Binding Path=Close}" />
-    </StackPanel>
+    <Border Background="White" CornerRadius="4">
+        <StackPanel Orientation="Horizontal" Margin="3,0">
+            <Button Content="&#xf048;" Command="{Binding Path=PreviousTrack}" />
+            <Button Content="&#xf04b;" Command="{Binding Path=Play}" />
+            <Button Content="&#xf04c;" Command="{Binding Path=Pause}" />
+            <Button Content="&#xf04d;" Command="{Binding Path=Stop}" />
+            <Button Content="&#xf051;" Command="{Binding Path=NextTrack}" />
+            <Button Content="&#xf052;" Command="{Binding Path=Eject}" />
+            <Button Content="&#xf057;" Command="{Binding Path=Close}" Foreground="DarkRed" />
+        </StackPanel>
+    </Border>
 </Window>
