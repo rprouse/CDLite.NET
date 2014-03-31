@@ -28,7 +28,7 @@ namespace Alteridem { namespace CD
         bool Close();
         bool Stop();
         bool NextTrack();
-        bool PrevTrack();
+        bool PreviousTrack();
         bool Play();
         bool Pause();
         bool Eject();

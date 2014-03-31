@@ -5,16 +5,32 @@ VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDPlayer", "CDPlayer\CDPlayer.vcxproj", "{62A17451-193B-469E-92F0-A48A77B0405C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDLite", "CDLite\CDLite.csproj", "{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Win32 = Debug|Win32
-		Release|Win32 = Release|Win32
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{62A17451-193B-469E-92F0-A48A77B0405C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{62A17451-193B-469E-92F0-A48A77B0405C}.Debug|Win32.Build.0 = Debug|Win32
-		{62A17451-193B-469E-92F0-A48A77B0405C}.Release|Win32.ActiveCfg = Release|Win32
-		{62A17451-193B-469E-92F0-A48A77B0405C}.Release|Win32.Build.0 = Release|Win32
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Debug|x64.ActiveCfg = Debug|x64
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Debug|x64.Build.0 = Debug|x64
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Debug|x86.ActiveCfg = Debug|Win32
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Debug|x86.Build.0 = Debug|Win32
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Release|x64.ActiveCfg = Release|x64
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Release|x64.Build.0 = Release|x64
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Release|x86.ActiveCfg = Release|Win32
+		{62A17451-193B-469E-92F0-A48A77B0405C}.Release|x86.Build.0 = Release|Win32
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Debug|x64.ActiveCfg = Debug|x64
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Debug|x64.Build.0 = Debug|x64
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Debug|x86.ActiveCfg = Debug|x86
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Debug|x86.Build.0 = Debug|x86
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Release|x64.ActiveCfg = Release|x64
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Release|x64.Build.0 = Release|x64
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Release|x86.ActiveCfg = Release|x86
+		{8096B1FF-27B1-4E9B-ADDF-43C92B074C1D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

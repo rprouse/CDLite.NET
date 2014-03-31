@@ -33,10 +33,10 @@ public:
     *         MCI_MODE_RECORD
     *         MCI_MODE_SEEK
     */
-    DWORD GetMode();
+    DWORD_PTR GetMode();
     BYTE  GetTrack();
     BYTE  GetNumberOfTracks();
-    DWORD GetPosition();
+    DWORD_PTR GetPosition();
 
     /// @return A string containing the drive letters for valid CDROM drives
     wchar_t* GetDrives();
@@ -80,7 +80,7 @@ protected:
     MCI_STATUS_TIME_FORMAT
     MCI_STATUS_MEDIA_PRESENT
     **/
-    DWORD GetStatus( DWORD dwItem, DWORD dwTrack = 0L );
+    DWORD_PTR GetStatus( DWORD dwItem, DWORD dwTrack = 0L );
     bool  SeekTrack( BYTE dwTrack );
 
     // Pass in the error code returned from another function to 

@@ -60,7 +60,7 @@ namespace Alteridem { namespace CD
         return _nativePlayer->NextTrack();
     }
 
-    bool CDPlayer::PrevTrack()
+    bool CDPlayer::PreviousTrack()
     {
         return _nativePlayer->PrevTrack();
     }
@@ -82,7 +82,7 @@ namespace Alteridem { namespace CD
 
     Mode CDPlayer::Mode::get()
     {
-        DWORD mode = _nativePlayer->GetMode();
+        DWORD_PTR mode = _nativePlayer->GetMode();
         switch ( mode )
         {
         case MCI_MODE_NOT_READY:
@@ -116,7 +116,7 @@ namespace Alteridem { namespace CD
 
     System::TimeSpan^ CDPlayer::Time::get()
     {
-        DWORD dwTMSF = _nativePlayer->GetPosition();
+        DWORD_PTR dwTMSF = _nativePlayer->GetPosition();
         int min = MCI_TMSF_MINUTE( dwTMSF );
         int sec = MCI_TMSF_SECOND( dwTMSF );
         return gcnew System::TimeSpan( 0, min, sec );

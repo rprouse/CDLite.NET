@@ -1,0 +1,34 @@
+﻿<Window x:Class="Alteridem.CDLite.CdView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:cdLite="clr-namespace:Alteridem.CDLite"
+        Title="CDLite" 
+        Height="30" 
+        Width="525" 
+        WindowStartupLocation="Manual" 
+        WindowStyle="None" 
+        ResizeMode="NoResize" 
+        SizeToContent="WidthAndHeight"
+        Closed="OnClosed"
+        mc:Ignorable="d" 
+        d:DataContext="{d:DesignInstance cdLite:CdViewModel}">
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="3" />
+        </Style>
+    </Window.Resources>
+    <StackPanel Orientation="Horizontal">
+        <Button Content="|&lt;" Command="{Binding Path=PreviousTrack}" />
+        <Button Content="&gt;" Command="{Binding Path=Play}" />
+        <Button Content="||" Command="{Binding Path=Pause}" />
+        <Button Content="[]" Command="{Binding Path=Stop}" />
+        <Button Content="&gt;|" Command="{Binding Path=NextTrack}" />
+        <Button Content="^" Command="{Binding Path=Eject}" />
+        <Button Content="X" Command="{Binding Path=Close}" />
+    </StackPanel>
+</Window>

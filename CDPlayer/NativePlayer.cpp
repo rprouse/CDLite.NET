@@ -30,8 +30,9 @@ NativePlayer::NativePlayer()
         }
     }
     m_numDevices = nCount;
-    m_strCdRomDrives = new wchar_t[nCount];
-    wcsncpy_s( m_strCdRomDrives, nCount, strTemp2, nCount );
+    m_strCdRomDrives = new wchar_t[nCount+1];
+    wcsncpy_s( m_strCdRomDrives, nCount*sizeof(wchar_t), strTemp2, nCount );
+    m_strCdRomDrives[nCount] = '\0';
 
     SetDriveID( 0 );
 }
@@ -221,7 +222,7 @@ bool NativePlayer::Eject()
     return SendCommand( m_wDeviceID, MCI_SET, MCI_SET_DOOR_OPEN, (DWORD)(LPCWSTR)&mciset );
 }
 
-DWORD NativePlayer::GetStatus( DWORD dwItem, DWORD dwTrack )
+DWORD_PTR NativePlayer::GetStatus( DWORD dwItem, DWORD dwTrack )
 {
     if ( !m_wDeviceID )
         return 0L;
@@ -237,7 +238,7 @@ DWORD NativePlayer::GetStatus( DWORD dwItem, DWORD dwTrack )
     return mciParms.dwReturn;
 }
 
-DWORD NativePlayer::GetMode()
+DWORD_PTR NativePlayer::GetMode()
 {
     return GetStatus( MCI_STATUS_MODE );
 }
@@ -252,7 +253,7 @@ BYTE NativePlayer::GetNumberOfTracks()
     return (BYTE)GetStatus( MCI_STATUS_NUMBER_OF_TRACKS );
 }
 
-DWORD NativePlayer::GetPosition()
+DWORD_PTR NativePlayer::GetPosition()
 {
     return GetStatus( MCI_STATUS_POSITION );
 }
