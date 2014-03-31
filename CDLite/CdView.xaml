@@ -15,7 +15,7 @@
         AllowsTransparency="True"
         Closed="OnClosed"
         mc:Ignorable="d" 
-        d:DataContext="{d:DesignInstance cdLite:CdViewModel}">
+        d:DataContext="{d:DesignInstance cdLite:CdViewModel}" Icon="cdlite.ico">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="Width" Value="20" />
