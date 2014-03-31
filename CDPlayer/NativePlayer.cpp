@@ -287,15 +287,14 @@ unsigned int NativePlayer::GetNumDrives()
     return m_numDevices;
 }
 
-DWORD NativePlayer::SetDriveID( unsigned int id )
+bool NativePlayer::SetDriveID( unsigned int id )
 {
     if ( id < m_numDevices )
     {
         m_currentDevice = id;
         return Open();
     }
-    else
-        return 1L;
+    return false;
 }
 
 unsigned int NativePlayer::GetDriveID()

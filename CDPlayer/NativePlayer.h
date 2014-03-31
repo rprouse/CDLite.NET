@@ -47,9 +47,9 @@ public:
     /**
     * Sets the CD drive that we will be using
     * @param id The index into the string returned by GetDrives() that we want to open
-    * @return 0 on success, 1 on failure
+    * @return true on success, false on failure
     **/
-    DWORD SetDriveID( unsigned int id );
+    bool SetDriveID( unsigned int id );
 
     /**
     * @return The index into the string returned by GetDrives() that we are currently using
