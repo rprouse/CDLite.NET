@@ -39,6 +39,9 @@ namespace Alteridem.CDLite
         private string _time = "00:00";
         private string _track = "00";
         private readonly DispatcherTimer _timer;
+        private bool _canPlay;
+        private bool _canStop;
+        private bool _canPause;
 
         public CdViewModel(IWindow window)
         {
@@ -65,9 +68,40 @@ namespace Alteridem.CDLite
                 int track = _player.Track;
                 _track = track.ToString( "00" );
                 OnPropertyChanged( "Track" );
+
                 TimeSpan time = _player.Time;
                 _time = time.ToString( @"mm\:ss" );
                 OnPropertyChanged( "Time" );
+
+                Mode mode = _player.Mode;
+                switch ( mode )
+                {
+                    case Mode.Pause:
+                        _canPause = true;
+                        _canPlay = true;
+                        _canStop = true;
+                        break;
+                    case Mode.Play:
+                        _canPause = true;
+                        _canPlay = false;
+                        _canStop = true;
+                        break;
+                    case Mode.Stop:
+                        _canPause = false;
+                        _canPlay = true;
+                        _canStop = false;
+                        break;
+                    case Mode.Open:
+                    case Mode.Record:
+                    case Mode.Seek:
+                    case Mode.NotReady:
+                    default:
+                        _canPause = false;
+                        _canPlay = false;
+                        _canStop = false;
+                        break;
+                }
+                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -164,17 +198,17 @@ namespace Alteridem.CDLite
 
         private bool CanPlay()
         {
-            return true;
+            return _canPlay;
         }
 
         private bool CanPause()
         {
-            return true;
+            return _canPause;
         }
 
         private bool CanStop()
         {
-            return true;
+            return _canStop;
         }
 
         private bool CanEject()

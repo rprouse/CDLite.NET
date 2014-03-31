@@ -4,7 +4,7 @@ class NativePlayer;
 
 namespace Alteridem { namespace CD
 {
-    public enum Mode
+    public enum class Mode
     {
         Unknown,
         NotReady,
